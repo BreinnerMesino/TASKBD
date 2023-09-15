@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang='es'>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial=scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <table>
+            <caption><b>Tareas</b></caption>
+            <tr>
+                {% for header in headings %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in data %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <li>
+            <button><a href="http://127.0.0.1:5000">Volver a la página principal.</a></button>
+        </li>
+    </body>
+</html>
