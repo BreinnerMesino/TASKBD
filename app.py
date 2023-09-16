@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 import pyodbc
 #Conexión a base de datos ----------------------------------------------
 # Código para correr el servidor con el index de HTML.
@@ -9,6 +9,8 @@ cursor = conn.cursor()
 headings_Task = ("ID", "Descripción", "Estado")
 #Rutas -----------------------------------------------------------------
 #Index.
+
+
 app = Flask(__name__)
 @app.route('/')
 def index():
@@ -31,8 +33,55 @@ def completeTask():
 @app.route('/delete-task')
 def deleteTask():
     return render_template('deleteTask.html')
+#Conseguir datos de los formularios
+@app.route('/get-new-task', methods=['POST'])
+def getNewTask():
+    if request.method == 'POST':
+        taskDescription = request.form['task_Description']
+        taskStatus = request.form['task_Status']
+        # Establece la conexión a la base de datos
+        cursorInsert = conn.cursor()
+        # Ejecuta la consulta para insertar los datos
+        cursorInsert.execute("INSERT INTO Tareas(Descripción, Estado) VALUES (?, ?)", (taskDescription, taskStatus))
+        # Confirma la transacción y cierra la conexión
+        conn.commit()
+        cursorInsert.close()
+        return render_template('taskSubmit.html')
+    else:
+        return render_template('taskError.html')
+@app.route('/deleted-task', methods=['POST'])
+def deletedTask():
+    if request.method == 'POST':
+        taskID = request.form['task_delete_ID']
+        # Establece la conexión a la base de datos
+        cursorDelete = conn.cursor()
+        # Ejecuta la consulta SQL para insertar datos
+        cursorDelete.execute("DELETE FROM Tareas WHERE ID=?",taskID)
+        # Confirma la transacción y cierra la conexión
+        conn.commit()
+        cursorDelete.close()
+        return render_template('taskSubmit.html')
+    else:
+        return render_template('taskError.html')
+
+@app.route('/completed-task', methods=['POST'])
+def completedTask():
+    if request.method == 'POST':
+        taskID = request.form['task_complete_ID']
+        # Establece la conexión a la base de datos
+        cursorCompleted = conn.cursor()
+        # Ejecuta la consulta SQL para insertar datos
+        cursorCompleted.execute("UPDATE Tareas SET Estado = ? WHERE ID = ?", 'Completado', taskID)
+        # Confirma la transacción y cierra la conexión
+        conn.commit()
+        cursorCompleted.close()
+        return render_template('taskSubmit.html')
+    else:
+        return render_template('taskError.html')
 if __name__ == '__main__':
     app.run()
+
+
 
 cursor.close()
 conn.close()
